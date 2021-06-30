@@ -1,0 +1,11 @@
+<!-- templates/registration/login.html -->
+
+<h2>Calorie Counter</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Log In</button>
+</form>
+
+
+<!-- standard Django form using POST to send data -->

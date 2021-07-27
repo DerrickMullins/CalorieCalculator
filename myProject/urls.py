@@ -18,7 +18,7 @@ from django.urls import path, include
 from myApp import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls), #admin
     path('accounts/', include('django.contrib.auth.urls')), #authorization/authenticate
     path('', views.index, name="index"), #connected to index view
     path('delete/<int:id>/', views.delete_consume, name='delete'), #connected to delete view

@@ -8,7 +8,6 @@ class Food(models.Model):
 	carbs = models.FloatField()
 	protein = models.FloatField()
 	fats = models.FloatField()
-	satFats = models.FloatField()
 	calories = models.IntegerField()
 
 	def __str__(self):

@@ -12,7 +12,7 @@
       integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
       crossorigin="anonymous"
     />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
   </head>
 
   <!--body-->
@@ -20,11 +20,14 @@
 
     <!--Navigation Bar-->
     <div class="container">
-      <div class="col-md-12">
-        <nav class="navbar navbar-dark bg-dark">
-          <img src="images/pApple.jpg" width="100" height="50" alt="" />
-          <a class="navbar-brand" href="#">Calorie Calculator</a>
-        </nav>
+      <div class="row">
+        <div class="col-md-10">
+            <nav class="navbar navbar-dark bg-dark">
+                {% load static %}
+              <img src="{% static 'myApp/pApple.jpg' %}" width="100" height="50" alt="" />
+              <a class="navbar-brand" href="#">Calorie Calculator</a>
+            </nav>
+        </div>
       </div>
 
       <br />
@@ -34,41 +37,46 @@
       <div style="text-align:center" class="row">
         <div class="col-md-12">
           <form method="POST" class="form-inline">
-          <!--label-->
-          <label class="col-md-2">
-            <b>What did you eat today?</b>
-          </label>
-          <!--Select tag = dropdown box-->
-          <select
-            class="col-md-6 form-control"
-            name="food_consumed"
-            id="food_consumed"
-          >
-            <option selected>Select</option>
-          </select> 
-          <!--addition button = add food-->
-          <button type="submit" class="btn btn-primary my-1">+</button>
+            {% csrf_token %}
+              <!--label-->
+              <label class="col-md-2">
+                <b>What did you eat today?</b>
+              </label>
+              <!--Select tag = dropdown box-->
+              <select
+                class="col-md-6 form-control"
+                name="food_consumed"
+                id="food_consumed"
+              >
+                {% for food in foods %}
+                <option value="{{food.name}}" selected>{{food.name}}</option>
+                {% endfor %}
+              </select> 
+              <!--addition button = add food-->
+              <button type="submit" class="btn btn-primary my-1">+</button>
+          </form>
         </div>
       </div>
-      </form>
+      
 
       <br>
       <br>
 
       <!--Nutrition table for food added-->
       <div class="row">
-        <div class="col-md-6"> 
+        <div class="col-md-7"> 
           <div> <h3> <b> Nutritional Value </b></h3></div>
           <table id="myTable"class="table table-dark">
             <!--Table Heading row-->
             <tr>
-              <th style="text-align:center">Name</th>
-              <th style="text-align:center">Carbs</th>
-              <th style="text-align:center">Protein</th>
-              <th style="text-align:center">Fats</th>
+              <th id="name" style="text-align:center">Name</th>
+              <th id="carbs" style="text-align:center">Carbs</th>
+              <th id="protein" style="text-align:center">Protein</th>
+              <th id="fats" style="text-align:center">Fats</th>
+              <th id="calories" style="text-align:center">Calories</th>
               <th style="text-align:center">Delete</th>
             </tr>
-
+            <!--for loop to add consumed food to table-->
             {% for f in consumed_food %}
 
             <!--food item data row-->
@@ -94,10 +102,10 @@
             <!--Totals row-->
             <tr class="bg-dark text-white">
               <td style="text-align:center" id="name"><b>Total</b></td>
-              <td style="text-align:center" id="totalCarbs"><b></b></td>
-              <td style="text-align:center" id="totalProtien"><b></b></td>
-              <td style="text-align:center" id="totalFats"><b></b></td>
-              <td style="text-align:center" id="totalCalories"><b></b></td>
+              <td style="text-align:center" id="sumCarbs"><b></b></td>
+              <td style="text-align:center" id="sumProtien"><b></b></td>
+              <td style="text-align:center" id="sumFats"><b></b></td>
+              <td style="text-align:center" id="sumCalories"><b></b></td>
             </tr>
 
           </table>
@@ -105,37 +113,62 @@
       </div>
       
       <!--Canvas-->
-      <div class="col-md-8"> 
-        <canvas id="myChart" width="400" height="400"></canvas>
+      <div class="row">
+        <div class="col-md-7"> 
+          <canvas id="myChart" width="400" height="300"></canvas>
+        </div>
       </div>
-
+      <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
       <!--Javascript to create chart-->
       <script>
-        var xValues = ["carbs","protein","fats","calories"];
-        var yValues = [75, 15, 25, 350];
-        var barColors = [
-          "#b91d47",
-          "#00aba9",
-          "#2b5797",
-          "#DAA520",
-          
-        ]
+        /*
+        // grab HTML table "myTable"
+        var table = document.getElementById("myTable");
+        // declare variables
+        var carbs = 0, protein = 0, fats = 0, calories = 0;
+        // loop through table rows (starting at 2nd column)
+        for (var i = 1; i < table.rows.length - 1; i++)
+        {
+            carbs = carbs + parseFloat(table.rows[i].cells[1].innerHTML);
+            protein = protein + parseFloat(table.rows[i].cells[2].innerHTML);
+            fats = fats + parseFloat(table.rows[i].cells[3].innerHTML);
+            calories = calories + parseFloat(table.rows[i].cells[4].innerHTML);
+        }
+
+        // grab html element by id and return HTML content
+        document.getElementById("sumCarbs").innerHTML = '<b>' + carbs + '(gm)</b>';
+        document.getElementById("sumProtien").innerHTML = '<b>' + protein + '(gm)</b>';
+        document.getElementById("sumFats").innerHTML = '<b>' + fats + '(gm)</b>';
+        document.getElementById("sumCalories").innerHTML = '<b>' + calories + '(gm)</b>';
+
+        // variables (data/lables) for graph
+        var total = carbs + protein + fats + calories;
+        var sumCarbs = Math.round((carbs / total) * 100);
+        var sumProtien = Math.round((protein / total) * 100);
+        var sumFats = Math.round((fats / total) * 100);
+        var sumCalories = Math.round((calories / total) * 100);
+        //--------------------------JS CHART-------------------------------------------------
+        // creating chart
         var ctx = document.getElementById('myChart').getContext('2d');
         var myChart = new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: xValues,
+                labels: ['carbs ' + sumCarbs + '%', 'protein ' + sumProtien + '%',
+                'fats ' + sumFats + '%', 'calories ' + sumCalories + '%'],
                 datasets: [{
-                    data: yValues,
-                    backgroundColor: barColors,
+                    data: [sumCarbs, sumProtien, sumFats, sumCalories],
+                    backgroundColor: [
+                    'rgba(158, 0, 190)',
+                    'rgba(255, 63, 0)',
+                    'rgba(238, 130, 238)',
+                    'rgba(233, 0, 190)',
+                ],
                     borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
+                    'rgba(158, 0, 190)',
+                    'rgba(255, 63, 0)',
+                    'rgba(238, 130, 238)',
+                    'rgba(233, 0, 190)',
+                ],
                     borderWidth: 1
                 }]
             },
@@ -146,8 +179,82 @@
               }
             }
         });
-      </script>
+        //------------------------------------------------------------------------------------
+        */
+        function BuildChart(labels, values, chartTitle)
+        {
+            var ctx = document.getElementById("myChart").getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                  labels: labels, // Our labels
+                  datasets: [{
+                    label: chartTitle, // Name the series
+                    data: values, // Our values
+                    backgroundColor: [ // Specify custom colors
+                    'rgba(158, 0, 190)',
+                    'rgba(255, 63, 0)',
+                    'rgba(238, 130, 238)',
+                    'rgba(233, 0, 190)',
+                    ],
+                    borderColor: [ // Add custom color borders
+                    'rgba(158, 0, 190)',
+                    'rgba(255, 63, 0)',
+                    'rgba(238, 130, 238)',
+                    'rgba(233, 0, 190)',
+                    ],
+                    borderWidth: 1 // Specify bar border width
+                  }]
+                },
+                options: {
+                  responsive: true, // Instruct chart js to respond nicely.
+                  maintainAspectRatio: false, // Add to prevent default behavior of full-width/height
+                  title:{
+                    display: true,
+                    text: "Daily Breakdown"
+                    } 
+                }
+              });
+              return myChart;
+            }
+            var table = document.getElementById('myTable');
+            var json = []; // First row needs to be headers 
+            var headers = [];
+            // Iterate the length of the table rows
+            for (var i = 0; i < table.rows[0].cells.length; i++) 
+            {
+              headers[i] = table.rows[0].cells[i].innerHTML.toLowerCase().replace(/ /gi, '');
+            }
 
+            // Go through cells 
+            for (var i = 1; i < table.rows.length; i++) {
+              var tableRow = table.rows[i];
+              var rowData = {};
+              for (var j = 0; j < tableRow.cells.length; j++) {
+                rowData[headers[j]] = tableRow.cells[j].innerHTML;
+              }
+
+              json.push(rowData);
+            }
+
+            console.log(json);
+
+            // Map JSON values back to label array
+            var labels = json.map(function (e) {
+              return e.name;
+            });
+            console.log(labels); // ["2016", "2017", "2018", "2019"]
+
+            // Map JSON values back to values array
+            var values = json.map(function (e) {
+              return e.carbs;
+            });
+            console.log(values); 
+
+            var chart = BuildChart(labels, values, "Nutrition");
+
+      </script>
+    <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
     </div>
   </body>
 </html>

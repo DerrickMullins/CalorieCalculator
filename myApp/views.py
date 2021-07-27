@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import Food, Consume
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
 
 # Create your views here.
 # User must login
@@ -30,6 +31,7 @@ def index(request):
 
 	return render(request, 'myApp/index.html', context)
 
+
 # model to delete consumed food
 def delete_consume(request, id):
 	consumed_food = Consume.objects.get(id=id)
@@ -37,3 +39,44 @@ def delete_consume(request, id):
 		consumed_food.delete()
 		return redirect('/')
 	return render(request, 'myApp/delete.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

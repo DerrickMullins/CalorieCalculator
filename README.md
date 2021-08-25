@@ -1,4 +1,6 @@
-Welcome to Calorie Calculator where you can track your food consumption with the touch of a finger!
+# Calorie Calculator
+
+Where you can track your food consumption with the touch of a finger!
 
 ## Technologies: Django
 

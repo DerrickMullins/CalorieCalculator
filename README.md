@@ -1,7 +1,7 @@
 # Calorie Calculator
 
 ## Description
-Track your food consumption (i.e calories, fats, protein, carbohydrates) with the touch of a finger!
+Track your food consumption (i.e. calories, fats, protein, carbohydrates) with the touch of a finger!
 
 ## Getting Started
 ### Dependencies
